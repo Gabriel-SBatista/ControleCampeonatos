@@ -1,0 +1,431 @@
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Campeonatos]    Script Date: 28/09/2023 11:55:05 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Campeonatos](
+	[ID_Campeonato] [smallint] IDENTITY(1,1) NOT NULL,
+	[Nome] [varchar](30) NOT NULL,
+	[Cidade] [varchar](30) NOT NULL,
+	[Ano_Edicao] [smallint] NOT NULL,
+	[Data_Inicio] [date] NOT NULL,
+	[Data_termino] [date] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID_Campeonato] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Ano_Edicao] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Campeonatos_Provas]    Script Date: 28/09/2023 11:55:16 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Campeonatos_Provas](
+	[ID_Campeonato] [smallint] NOT NULL,
+	[ID_Prova] [smallint] NOT NULL,
+	[Data_Hora] [datetime] NOT NULL
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Campeonatos_Provas]  WITH CHECK ADD  CONSTRAINT [fk_Campeonato_Prova] FOREIGN KEY([ID_Campeonato])
+REFERENCES [dbo].[tbl_Campeonatos] ([ID_Campeonato])
+GO
+
+ALTER TABLE [dbo].[tbl_Campeonatos_Provas] CHECK CONSTRAINT [fk_Campeonato_Prova]
+GO
+
+ALTER TABLE [dbo].[tbl_Campeonatos_Provas]  WITH CHECK ADD  CONSTRAINT [fk_Prova_Campeonato] FOREIGN KEY([ID_Prova])
+REFERENCES [dbo].[tbl_Provas] ([ID_Prova])
+GO
+
+ALTER TABLE [dbo].[tbl_Campeonatos_Provas] CHECK CONSTRAINT [fk_Prova_Campeonato]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Equipes]    Script Date: 28/09/2023 11:55:31 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Equipes](
+	[Codigo_Equipe] [smallint] NOT NULL,
+	[Cidade_Sede] [varchar](30) NOT NULL,
+	[Data_Fundacao] [date] NOT NULL,
+	[Numero_Campeonato] [smallint] NULL,
+	[Numero_Titulo] [smallint] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Codigo_Equipe] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Equipes] ADD  DEFAULT ((0)) FOR [Numero_Campeonato]
+GO
+
+ALTER TABLE [dbo].[tbl_Equipes] ADD  DEFAULT ((0)) FOR [Numero_Titulo]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Estilos]    Script Date: 28/09/2023 11:55:37 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Estilos](
+	[Codigo_Estilo] [smallint] IDENTITY(1,1) NOT NULL,
+	[Nome] [varchar](30) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Codigo_Estilo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Nome] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Medalhas]    Script Date: 28/09/2023 11:55:45 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Medalhas](
+	[ID_Medalha] [smallint] IDENTITY(1,1) NOT NULL,
+	[Tipo] [varchar](10) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID_Medalha] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Tipo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Nadadores]    Script Date: 28/09/2023 11:55:56 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Nadadores](
+	[ID_Sexo] [smallint] NOT NULL,
+	[Numero_Matricula] [int] NOT NULL,
+	[Data_Inscricao] [date] NOT NULL,
+	[Email] [varchar](40) NOT NULL,
+	[Numero_Cameponato] [smallint] NULL,
+	[Data_Nascimento] [date] NOT NULL,
+UNIQUE NONCLUSTERED 
+(
+	[Email] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores] ADD  DEFAULT ((0)) FOR [Numero_Cameponato]
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores]  WITH CHECK ADD  CONSTRAINT [fk_Pessoa_Nadador] FOREIGN KEY([Numero_Matricula])
+REFERENCES [dbo].[tbl_Pessoas] ([Numero_Matricula])
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores] CHECK CONSTRAINT [fk_Pessoa_Nadador]
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores]  WITH CHECK ADD  CONSTRAINT [fk_Sexo_Nadador] FOREIGN KEY([ID_Sexo])
+REFERENCES [dbo].[tbl_Sexos] ([ID_Sexo])
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores] CHECK CONSTRAINT [fk_Sexo_Nadador]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Nadadores_Provas]    Script Date: 28/09/2023 11:56:08 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Nadadores_Provas](
+	[Numero_Matricula] [int] NOT NULL,
+	[ID_Prova] [smallint] NOT NULL,
+	[ID_Medalha] [smallint] NULL
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores_Provas]  WITH CHECK ADD  CONSTRAINT [fk_Medalha_Prova] FOREIGN KEY([ID_Medalha])
+REFERENCES [dbo].[tbl_Medalhas] ([ID_Medalha])
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores_Provas] CHECK CONSTRAINT [fk_Medalha_Prova]
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores_Provas]  WITH CHECK ADD  CONSTRAINT [fk_Nadador_Prova] FOREIGN KEY([Numero_Matricula])
+REFERENCES [dbo].[tbl_Pessoas] ([Numero_Matricula])
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores_Provas] CHECK CONSTRAINT [fk_Nadador_Prova]
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores_Provas]  WITH CHECK ADD  CONSTRAINT [fk_Prova_Nadador] FOREIGN KEY([ID_Prova])
+REFERENCES [dbo].[tbl_Provas] ([ID_Prova])
+GO
+
+ALTER TABLE [dbo].[tbl_Nadadores_Provas] CHECK CONSTRAINT [fk_Prova_Nadador]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Pessoas]    Script Date: 28/09/2023 11:56:19 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Pessoas](
+	[Numero_Matricula] [int] NOT NULL,
+	[Codigo_Equipe] [smallint] NOT NULL,
+	[Nome] [varchar](30) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Numero_Matricula] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Pessoas]  WITH CHECK ADD  CONSTRAINT [fk_Codigo_Equipe] FOREIGN KEY([Codigo_Equipe])
+REFERENCES [dbo].[tbl_Equipes] ([Codigo_Equipe])
+GO
+
+ALTER TABLE [dbo].[tbl_Pessoas] CHECK CONSTRAINT [fk_Codigo_Equipe]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Provas]    Script Date: 28/09/2023 11:56:24 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Provas](
+	[ID_Prova] [smallint] IDENTITY(1,1) NOT NULL,
+	[ID_Sexo_Participante] [smallint] NOT NULL,
+	[Codigo_Estilo] [smallint] NOT NULL,
+	[Distancia] [smallint] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID_Prova] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+ CONSTRAINT [Provas_un] UNIQUE NONCLUSTERED 
+(
+	[ID_Sexo_Participante] ASC,
+	[Codigo_Estilo] ASC,
+	[Distancia] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Provas]  WITH CHECK ADD  CONSTRAINT [fk_Estilo_Prova] FOREIGN KEY([Codigo_Estilo])
+REFERENCES [dbo].[tbl_Estilos] ([Codigo_Estilo])
+GO
+
+ALTER TABLE [dbo].[tbl_Provas] CHECK CONSTRAINT [fk_Estilo_Prova]
+GO
+
+ALTER TABLE [dbo].[tbl_Provas]  WITH CHECK ADD  CONSTRAINT [fk_Sexo_Prova] FOREIGN KEY([ID_Sexo_Participante])
+REFERENCES [dbo].[tbl_Sexos] ([ID_Sexo])
+GO
+
+ALTER TABLE [dbo].[tbl_Provas] CHECK CONSTRAINT [fk_Sexo_Prova]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Recordes]    Script Date: 28/09/2023 11:56:40 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Recordes](
+	[ID_Recorde] [smallint] IDENTITY(1,1) NOT NULL,
+	[Numero_Matricula] [int] NOT NULL,
+	[ID_Prova] [smallint] NOT NULL,
+	[Data_Recorde] [date] NOT NULL,
+	[Tempo] [smallint] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID_Recorde] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Recordes]  WITH CHECK ADD  CONSTRAINT [fk_Recorde_Nadador] FOREIGN KEY([Numero_Matricula])
+REFERENCES [dbo].[tbl_Pessoas] ([Numero_Matricula])
+GO
+
+ALTER TABLE [dbo].[tbl_Recordes] CHECK CONSTRAINT [fk_Recorde_Nadador]
+GO
+
+ALTER TABLE [dbo].[tbl_Recordes]  WITH CHECK ADD  CONSTRAINT [fk_Recorde_Prova] FOREIGN KEY([ID_Prova])
+REFERENCES [dbo].[tbl_Provas] ([ID_Prova])
+GO
+
+ALTER TABLE [dbo].[tbl_Recordes] CHECK CONSTRAINT [fk_Recorde_Prova]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Sexos]    Script Date: 28/09/2023 11:56:49 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Sexos](
+	[ID_Sexo] [smallint] IDENTITY(1,1) NOT NULL,
+	[Sexo] [varchar](10) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID_Sexo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Sexo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Telefones_Nadadores]    Script Date: 28/09/2023 11:56:59 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Telefones_Nadadores](
+	[Numero_Matricula] [int] NOT NULL,
+	[ID_Tipo_Telefone] [smallint] NOT NULL,
+	[Numero] [bigint] NOT NULL,
+UNIQUE NONCLUSTERED 
+(
+	[Numero] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Telefones_Nadadores]  WITH CHECK ADD  CONSTRAINT [fk_Telefone_Nadador] FOREIGN KEY([Numero_Matricula])
+REFERENCES [dbo].[tbl_Pessoas] ([Numero_Matricula])
+GO
+
+ALTER TABLE [dbo].[tbl_Telefones_Nadadores] CHECK CONSTRAINT [fk_Telefone_Nadador]
+GO
+
+ALTER TABLE [dbo].[tbl_Telefones_Nadadores]  WITH CHECK ADD  CONSTRAINT [fk_Tipo_Telefone] FOREIGN KEY([ID_Tipo_Telefone])
+REFERENCES [dbo].[tbl_Tipos_Telefones] ([ID_Tipos_Telefones])
+GO
+
+ALTER TABLE [dbo].[tbl_Telefones_Nadadores] CHECK CONSTRAINT [fk_Tipo_Telefone]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Tipos_Telefones]    Script Date: 28/09/2023 11:57:18 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Tipos_Telefones](
+	[ID_Tipos_Telefones] [smallint] IDENTITY(1,1) NOT NULL,
+	[Tipo] [varchar](10) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID_Tipos_Telefones] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Tipo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+USE [db_CBDA]
+GO
+
+/****** Object:  Table [dbo].[tbl_Treinadores]    Script Date: 28/09/2023 11:57:29 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_Treinadores](
+	[Numero_Matricula] [int] NOT NULL,
+	[Numero_Titulo] [smallint] NULL,
+	[Formacao_Academica] [varchar](30) NOT NULL
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tbl_Treinadores] ADD  DEFAULT ((0)) FOR [Numero_Titulo]
+GO
+
+ALTER TABLE [dbo].[tbl_Treinadores]  WITH CHECK ADD  CONSTRAINT [fk_Numero_Matricula] FOREIGN KEY([Numero_Matricula])
+REFERENCES [dbo].[tbl_Pessoas] ([Numero_Matricula])
+GO
+
+ALTER TABLE [dbo].[tbl_Treinadores] CHECK CONSTRAINT [fk_Numero_Matricula]
+GO
