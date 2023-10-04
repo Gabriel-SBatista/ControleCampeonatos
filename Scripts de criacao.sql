@@ -40,6 +40,7 @@ Sexo varchar(15) unique not null
 
 create table Pessoas(
 ID_Pessoa int primary key identity,
+ID_Equipe int not null constraint fk_Equipe_Pessoa foreign key(ID_Equipe) references Equipes(ID_Equipe),
 Numero_Matricula int unique not null,
 Nome varchar(30) not null
 )

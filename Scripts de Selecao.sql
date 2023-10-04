@@ -126,6 +126,7 @@ while @Contador <= @Numero_Equipes
 		set @Contador = @Contador + 1
 	end;
 
+
 select P.Distancia as Metros, E.Nome, S.Sexo from Provas as P inner join Estilos as E on P.ID_Estilo = E.ID_Estilo inner join Sexos as S on S.ID_Sexo = P.ID_Sexo
 
 select P.Distancia as Metros, E.Nome, S.Sexo from Provas as P inner join Estilos as E on P.ID_Estilo = E.ID_Estilo inner join Sexos as S on S.ID_Sexo = P.ID_Sexo order by Metros desc
