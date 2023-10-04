@@ -94,38 +94,36 @@ select P.Nome, P.Numero_Matricula, N.Email from Nadadores as N inner join Pessoa
 
 select P.Nome, P.Numero_Matricula, T.Numero from Nadadores as N inner join Pessoas as P on P.ID_Pessoa = N.ID_Pessoa inner join Telefones_Nadadores as T on N.ID_Nadador = T.ID_Nadador where T.Numero = 992112369
 
-select top(3) with ties Resultado.Treinador, count(Resultado.Medalhas) as Total from (select P.Nome as Treinador, NP.ID_Medalha as Medalhas from Treinadores as T inner join Pessoas as P on P.ID_Pessoa = T.ID_Pessoa 
-inner join Nadadores_Provas as NP on NP.ID_Treinador = T.ID_Treinador where NP.ID_Medalha = 1) 
-as Resultado group by Resultado.Treinador order by Total desc
+select top(3) with ties	P.Nome, count(*) as Quantidade_Titulos
+	from Treinadores T
+		inner join Pessoas P
+			on P.ID_Pessoa = T.ID_Pessoa
+		inner join Nadadores_Provas NP
+			on NP.ID_Treinador = T.ID_Treinador
+	where NP.ID_Medalha = 1
+	group by P.Nome
+	order by Quantidade_Titulos desc
 
 select P.Nome, P.Numero_Matricula, E.Nome from Pessoas as P inner join Nadadores as N on P.ID_Pessoa = N.ID_Pessoa inner join Equipes as E on P.ID_Equipe = E.ID_Equipe where P.ID_Equipe = 1
 
-select top(1) with ties Resultado.Equipe, count(Resultado.Nome) as Quantidade_Nadador from (select E.Nome as Equipe, P.Nome from Equipes as E inner join Pessoas as P on P.ID_Equipe = E.ID_Equipe 
-inner join Nadadores as N on N.ID_Pessoa = P.ID_Pessoa) as Resultado group by Resultado.Equipe order by Quantidade_Nadador desc
+select top(1) with ties	E.Nome, Count(*) as Quantidade_Nadadores
+	from Equipes E
+		inner join Pessoas P
+			on P.ID_Equipe = E.ID_Equipe
+		inner join Nadadores N
+			on N.ID_Pessoa = P.ID_Pessoa
+	group by E.Nome
+	order by Quantidade_Nadadores desc
 
-declare @Numero_Equipes int
-declare @Contador int
-
-set @Contador = 1
-set @Numero_Equipes = (select count(*) from Equipes)
-
-while @Contador <= @Numero_Equipes
-	begin
-		if @Contador < 2
-			if (select Cidade_Sede from Equipes where ID_Equipe = @Contador) = (select Cidade_Sede from Equipes where ID_Equipe = 2)
-				select P.Nome, E.Nome, E.Cidade_Sede from Nadadores as N inner join Pessoas as P on P.ID_Pessoa = N.ID_Pessoa inner join Equipes
-				as E on E.ID_Equipe = P.ID_Equipe where E.ID_Equipe = @Contador or E.ID_Equipe = 2
-		if @Contador < 3
-			if (select Cidade_Sede from Equipes where ID_Equipe = @Contador) = (select Cidade_Sede from Equipes where ID_Equipe = 3)
-				select P.Nome, E.Nome, E.Cidade_Sede from Nadadores as N inner join Pessoas as P on P.ID_Pessoa = N.ID_Pessoa inner join Equipes as E 
-				on E.ID_Equipe = P.ID_Equipe where E.ID_Equipe = @Contador or E.ID_Equipe = 3
-		if @Contador < 4
-			if (select Cidade_Sede from Equipes where ID_Equipe = @Contador) = (select Cidade_Sede from Equipes where ID_Equipe = 4)
-				select P.Nome, E.Nome, E.Cidade_Sede from Nadadores as N inner join Pessoas as P on P.ID_Pessoa = N.ID_Pessoa inner join Equipes  as E 
-				on E.ID_Equipe = P.ID_Equipe where E.ID_Equipe = @Contador or E.ID_Equipe = 4
-		set @Contador = @Contador + 1
-	end;
-
+select	P.Nome,
+		E.Nome,
+		E.Cidade_Sede
+	from Nadadores N
+		inner join Pessoas P
+			on P.ID_Pessoa = N.ID_Nadador
+		inner join Equipes E
+			on P.ID_Equipe = E.ID_Equipe
+	where E.Cidade_Sede = 'Franca'
 
 select P.Distancia as Metros, E.Nome, S.Sexo from Provas as P inner join Estilos as E on P.ID_Estilo = E.ID_Estilo inner join Sexos as S on S.ID_Sexo = P.ID_Sexo
 
@@ -147,12 +145,35 @@ select Resultado.ID_Prova_Campeonato, count(Resultado.ID_Nadador_Equipe) as Quan
 inner join Estilos as E on E.ID_Estilo = Pr.ID_Estilo inner join Sexos as S on S.ID_Sexo = Pr.ID_Sexo inner join Campeonatos as C on C.ID_Campeonato = PC.ID_Campeonato 
 inner join Nadadores_Provas as NP on NP.ID_Prova_Campeonato = PC.ID_Prova_Campeonato where datepart(hour, PC.Data_Hora) between 14 and 16) as Resultado group by Resultado.ID_Prova_Campeonato
 
-create view MedalhaOuro 
-as select Nadadores.ID_Nadador, Pessoas.Nome, Medalhas.ID_Medalha from Pessoas inner join Nadadores on Nadadores.ID_Pessoa = Pessoas.ID_Pessoa 
-inner join Nadadores_Provas on Nadadores.ID_Nadador = Nadadores_Provas.ID_Nadador inner join Medalhas on Medalhas.ID_Medalha = Nadadores_Provas.ID_Medalha where Nadadores_Provas.ID_Medalha = 1
+;with MedalhaOuro (ID_Nadador, Nome, ID_Medalha) as (
+	select	Nadadores.ID_Nadador, 
+			Pessoas.Nome, 
+			Medalhas.ID_Medalha 
+	from Pessoas 
+		inner join Nadadores 
+			on Nadadores.ID_Pessoa = Pessoas.ID_Pessoa 
+		inner join Nadadores_Provas 
+			on Nadadores.ID_Nadador = Nadadores_Provas.ID_Nadador 
+		inner join Medalhas 
+			on Medalhas.ID_Medalha = Nadadores_Provas.ID_Medalha 
+	where Nadadores_Provas.ID_Medalha = 1
+), 
+	MedalhaPrata (ID_Nadador, Nome, ID_Medalha) as (
+	select	Nadadores.ID_Nadador, 
+			Pessoas.Nome, 
+			Medalhas.ID_Medalha 
+	from Pessoas 
+		inner join Nadadores 
+			on Nadadores.ID_Pessoa = Pessoas.ID_Pessoa 
+		inner join Nadadores_Provas 
+			on Nadadores.ID_Nadador = Nadadores_Provas.ID_Nadador 
+		inner join Medalhas 
+			on Medalhas.ID_Medalha = Nadadores_Provas.ID_Medalha 
+	where Nadadores_Provas.ID_Medalha = 2
+)
 
-create view MedalhaPrata
-as select Nadadores.ID_Nadador, Pessoas.Nome, Medalhas.ID_Medalha from Pessoas inner join Nadadores on Nadadores.ID_Pessoa = Pessoas.ID_Pessoa 
-inner join Nadadores_Provas on Nadadores.ID_Nadador = Nadadores_Provas.ID_Nadador inner join Medalhas on Medalhas.ID_Medalha = Nadadores_Provas.ID_Medalha where Nadadores_Provas.ID_Medalha = 2
-
-select MedalhaOuro.Nome from MedalhaOuro inner join MedalhaPrata on MedalhaOuro.ID_Nadador = MedalhaPrata.ID_Nadador group by MedalhaOuro.Nome
+select	MedalhaOuro.Nome 
+	from MedalhaOuro 
+		inner join MedalhaPrata 
+			on MedalhaOuro.ID_Nadador = MedalhaPrata.ID_Nadador 
+	group by MedalhaOuro.Nome
