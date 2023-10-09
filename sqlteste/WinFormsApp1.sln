@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sqlteste", "sqlteste.csproj", "{CE415A34-6FE7-494C-AC2A-21A97F63E46A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsApp1", "WinFormsApp1\WinFormsApp1.csproj", "{7B715957-1543-4B47-92D0-4EA123353224}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CE415A34-6FE7-494C-AC2A-21A97F63E46A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE415A34-6FE7-494C-AC2A-21A97F63E46A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE415A34-6FE7-494C-AC2A-21A97F63E46A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE415A34-6FE7-494C-AC2A-21A97F63E46A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B715957-1543-4B47-92D0-4EA123353224}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B715957-1543-4B47-92D0-4EA123353224}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B715957-1543-4B47-92D0-4EA123353224}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B715957-1543-4B47-92D0-4EA123353224}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {F41D9EF1-B2DD-4770-8C97-E8899D7C15CF}
+		SolutionGuid = {402C3C7A-8DBD-4B9F-B1C4-D9727EFEA0E3}
 	EndGlobalSection
 EndGlobal
