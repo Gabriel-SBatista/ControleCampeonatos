@@ -1,4 +1,5 @@
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace WinFormsApp1
 {
@@ -16,22 +17,27 @@ namespace WinFormsApp1
             {
                 listBox1.Items.Clear();
 
-                connection.Open();
-
                 string sql = "SELECT * FROM Estilos";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    try
                     {
-                        while (reader.Read())
+                        connection.Open();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            listBox1.Items.Add(reader.GetByte(reader.GetOrdinal("ID_Estilo")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Nome")));
+                            while (reader.Read())
+                            {
+                                listBox1.Items.Add(reader.GetByte(reader.GetOrdinal("ID_Estilo")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Nome")));
+                            }
                         }
+                        connection.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
                     }
                 }
-
-                connection.Close();
             }
         }
 
@@ -39,22 +45,30 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
 
-                string sql = "SELECT * from Estilos WHERE ID_Estilo=" + textBoxBuscaEstilo.Text;
+                string sql = "SELECT * from Estilos WHERE ID_Estilo=@ID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            MessageBox.Show(reader.GetByte(reader.GetOrdinal("ID_Estilo")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Nome")));
-                        }
-                    }
-                }
+                    cmd.Parameters.Add("@ID", SqlDbType.TinyInt).Value = textBoxBuscaEstilo.Text;
 
-                connection.Close();
+                    try
+                    {
+                        connection.Open();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                MessageBox.Show(reader.GetByte(reader.GetOrdinal("ID_Estilo")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Nome")));
+                            }
+                        }
+                        connection.Close();
+                    }
+                    catch(Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }            
             }
         }
 
@@ -62,20 +76,29 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
+                
 
-                string sql = "INSERT INTO Estilos(Nome)" + "VALUES ('" + textBoxCriaEstilo.Text + "')";
+                string sql = "INSERT INTO Estilos(Nome) VALUES (@Nome)";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    int i = cmd.ExecuteNonQuery();
-                    if (i > 0)
-                    {
-                        MessageBox.Show("Estilo inserido com sucesso!");
-                    }
-                }
+                    cmd.Parameters.Add("@Nome", SqlDbType.NVarChar, 15).Value = textBoxCriaEstilo.Text;
 
-                connection.Close();
+                    try
+                    {
+                        connection.Open();
+                        int i = cmd.ExecuteNonQuery();
+                        if (i > 0)
+                        {
+                            MessageBox.Show("Estilo inserido com sucesso!");
+                        }
+                        connection.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }         
             }
         }
 
@@ -83,19 +106,26 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
-
-                string sql = "UPDATE Estilos SET Nome= '" + textBoxAlteraEstiloEstilo.Text + "' WHERE ID_Estilo=" + textBoxAlteraEstiloID.Text;
+                string sql = "UPDATE Estilos SET Nome= @Nome WHERE ID_Estilo= @ID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    int i = cmd.ExecuteNonQuery();
-                    if (i == 1)
-                        MessageBox.Show("Estilo alterado com sucesso!");
+                    cmd.Parameters.Add("@Nome", SqlDbType.NVarChar, 15).Value = textBoxAlteraEstiloEstilo.Text;
+                    cmd.Parameters.Add("@ID", SqlDbType.SmallInt).Value = textBoxAlteraEstiloID.Text;
+
+                    try
+                    {
+                        connection.Open();
+                        int i = cmd.ExecuteNonQuery();
+                        if (i == 1)
+                            MessageBox.Show("Estilo alterado com sucesso!");
+                        connection.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
                 }
-
-
-                connection.Close();
             }
         }
 
@@ -103,18 +133,24 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
-
-                string sql = "DELETE from Estilos WHERE ID_Estilo=" + textBoxExcluiEstilo.Text;
+                string sql = "DELETE from Estilos WHERE ID_Estilo=@ID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    int i = cmd.ExecuteNonQuery();
-                    if (i == 1)
-                        MessageBox.Show("Estilo removido com sucesso!");
+                    cmd.Parameters.Add("@ID", SqlDbType.SmallInt).Value = textBoxExcluiEstilo.Text;
+                    try
+                    {
+                        connection.Open();
+                        int i = cmd.ExecuteNonQuery();
+                        if (i == 1)
+                            MessageBox.Show("Estilo removido com sucesso!");
+                        connection.Close();
+                    }
+                    catch(Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
                 }
-
-                connection.Close();
             }
         }
 
@@ -122,18 +158,27 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
+                
 
-                string sql = "INSERT INTO Tipos_Telefones (Tipo)" + "VALUES ('" + textBoxCriaTipoTelefone.Text + "')";
+                string sql = "INSERT INTO Tipos_Telefones (Tipo) VALUES (@Tipo)";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    int i = cmd.ExecuteNonQuery();
-                    if (i > 0)
-                        MessageBox.Show("Tipo de Telefone inserido com sucesso");
-                }
+                    cmd.Parameters.Add("@Tipo", SqlDbType.NVarChar, 15).Value = textBoxCriaTipoTelefone.Text;
 
-                connection.Close();
+                    try
+                    {
+                        connection.Open();
+                        int i = cmd.ExecuteNonQuery();
+                        if (i > 0)
+                            MessageBox.Show("Tipo de Telefone inserido com sucesso");
+                        connection.Close();
+                    }
+                    catch( Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
             }
         }
 
@@ -141,18 +186,26 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
-
-                string sql = "UPDATE Tipos_Telefones SET Tipo= '" + textBoxAlteraTipoTelefoneTipo.Text + "' WHERE ID_Tipo_Telefone=" + textBoxAlteraTipoTelefoneID.Text;
+                string sql = "UPDATE Tipos_Telefones SET Tipo=@Tipo WHERE ID_Tipo_Telefone=@ID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    int i = cmd.ExecuteNonQuery();
-                    if (i == 1)
-                        MessageBox.Show("Estilo de prova alterado com sucesso");
-                }
+                    cmd.Parameters.Add("@Tipo", SqlDbType.NVarChar, 15).Value = textBoxAlteraTipoTelefoneTipo.Text;
+                    cmd.Parameters.Add("@ID", SqlDbType.TinyInt).Value = textBoxAlteraTipoTelefoneID.Text;
 
-                connection.Close();
+                    try
+                    {
+                        connection.Open();
+                        int i = cmd.ExecuteNonQuery();
+                        if (i == 1)
+                            MessageBox.Show("Estilo de prova alterado com sucesso");
+                        connection.Close();
+                    }
+                    catch ( Exception ex )
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
             }
         }
 
@@ -160,18 +213,25 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
-
-                string sql = "DELETE from Tipos_Telefones WHERE ID_Tipo_Telefone=" + textBoxExcluiTipoTelefone.Text;
+                string sql = "DELETE from Tipos_Telefones WHERE ID_Tipo_Telefone=@ID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    int i = cmd.ExecuteNonQuery();
-                    if (i == 1)
-                        MessageBox.Show("Tipo removido com sucesso!");
-                }
+                    cmd.Parameters.Add("@ID", SqlDbType.TinyInt).Value = textBoxExcluiTipoTelefone.Text;
 
-                connection.Close();
+                    try
+                    {
+                        connection.Open();
+                        int i = cmd.ExecuteNonQuery();
+                        if (i == 1)
+                            MessageBox.Show("Tipo removido com sucesso!");
+                        connection.Close();
+                    }
+                    catch ( Exception ex )
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
             }
         }
 
@@ -179,23 +239,30 @@ namespace WinFormsApp1
         {
             using (SqlConnection connection = new SqlConnection(builder))
             {
-                connection.Open();
-
-                string sql = "SELECT * from Tipos_Telefones WHERE ID_Tipo_Telefone=" + textBoxBuscaTipoTelefone.Text;
+                string sql = "SELECT * from Tipos_Telefones WHERE ID_Tipo_Telefone=@ID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
+                    cmd.Parameters.Add("@ID", SqlDbType.TinyInt).Value = textBoxBuscaTipoTelefone.Text;
 
-                        while (reader.Read())
+                    try
+                    {
+                        connection.Open();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            MessageBox.Show(reader.GetByte(reader.GetOrdinal("ID_Tipo_Telefone")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Tipo")));
+
+                            while (reader.Read())
+                            {
+                                MessageBox.Show(reader.GetByte(reader.GetOrdinal("ID_Tipo_Telefone")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Tipo")));
+                            }
                         }
+                        connection.Close();
+                    }
+                    catch ( Exception ex )
+                    {
+                        MessageBox.Show(ex.Message);
                     }
                 }
-
-                connection.Close();
             }
         }
 
@@ -205,23 +272,28 @@ namespace WinFormsApp1
             {
                 listBox3.Items.Clear();
 
-                connection.Open();
-
                 string sql = "SELECT * FROM Tipos_Telefones";
 
                 using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    try
                     {
-
-                        while (reader.Read())
+                        connection.Open();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            listBox3.Items.Add(reader.GetByte(reader.GetOrdinal("ID_Tipo_Telefone")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Tipo")));
+
+                            while (reader.Read())
+                            {
+                                listBox3.Items.Add(reader.GetByte(reader.GetOrdinal("ID_Tipo_Telefone")).ToString() + " - " + reader.GetString(reader.GetOrdinal("Tipo")));
+                            }
                         }
+                        connection.Close();
+                    }
+                    catch( Exception ex )
+                    {
+                        MessageBox.Show(ex.Message);
                     }
                 }
-
-                connection.Close();
             }
         }
     }
