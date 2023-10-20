@@ -44,9 +44,6 @@ namespace WinFormsApp2
             comboBoxEstilos.ValueMember = "IdEstilo";
             comboBoxEstilos.DataSource = estilos;
 
-            comboBoxEstilos.Text = "";
-            comboBoxSexo.Text = "";
-
             dataGridViewProvas.ColumnCount = 4;
             dataGridViewProvas.Columns[0].Name = "Id";
             dataGridViewProvas.Columns[1].Name = "Tipo";
@@ -75,125 +72,20 @@ namespace WinFormsApp2
             var provas = new List<Prova>();
             int i = 0;
 
-            if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && (comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos") && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
-            {
-                provas = provaRepo.BuscaProvas(Int32.Parse(comboBoxEstilos.SelectedValue.ToString()),
-                    Int32.Parse(comboBoxSexo.SelectedValue.ToString()),
-                    Int32.Parse(textBoxDistancia.Text));
-                foreach (Prova prova in provas)
-                {
-                    if (prova.Estilo == comboBoxEstilos.Text
-                        && prova.Sexo == comboBoxSexo.Text
-                        && prova.Distancia.ToString() == textBoxDistancia.Text)
-                    {
-                        dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
-                        dataGridViewProvas[4, i].Value = "Editar";
-                        dataGridViewProvas[5, i].Value = "Excluir";
-                        i++;
-                    }
-                }
-            }
-            else if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && (comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos"))
-            {
-                provas = provaRepo.BuscaProvas(Int32.Parse(comboBoxEstilos.SelectedValue.ToString()), 0,
-                    Int32.Parse(textBoxDistancia.Text));
-                foreach (Prova prova in provas)
-                {
-                    if (prova.Estilo == comboBoxEstilos.Text && prova.Distancia.ToString() == textBoxDistancia.Text)
-                    {
-                        dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
-                        dataGridViewProvas[4, i].Value = "Editar";
-                        dataGridViewProvas[5, i].Value = "Excluir";
-                        i++;
-                    }
-                }
-            }
-            else if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
-            {
-                foreach (Prova prova in provas)
-                {
-                    provas = provaRepo.BuscaProvas(0, Int32.Parse(comboBoxSexo.SelectedValue.ToString()),
-                    Int32.Parse(textBoxDistancia.Text));
-                    if (prova.Sexo == comboBoxSexo.Text && prova.Distancia.ToString() == textBoxDistancia.Text)
-                    {
-                        dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
-                        dataGridViewProvas[4, i].Value = "Editar";
-                        dataGridViewProvas[5, i].Value = "Excluir";
-                        i++;
-                    }
-                }
-            }
-            else if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)"))
-            {
-                foreach (Prova prova in provas)
-                {
-                    provas = provaRepo.BuscaProvas(0, 0, Int32.Parse(textBoxDistancia.Text));
-                    if (prova.Distancia.ToString() == textBoxDistancia.Text)
-                    {
-                        dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
-                        dataGridViewProvas[4, i].Value = "Editar";
-                        dataGridViewProvas[5, i].Value = "Excluir";
-                        i++;
-                    }
-                }
-            }
-            else if ((comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos") && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
-            {
-                provas = provaRepo.BuscaProvas(Int32.Parse(comboBoxEstilos.SelectedValue.ToString()),
-                                    Int32.Parse(comboBoxSexo.SelectedValue.ToString()), 0);
-                foreach (Prova prova in provas)
-                {
-                    if (prova.Estilo == comboBoxEstilos.Text && prova.Sexo == comboBoxSexo.Text)
-                    {
-                        dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
-                        dataGridViewProvas[4, i].Value = "Editar";
-                        dataGridViewProvas[5, i].Value = "Excluir";
-                        i++;
-                    }
-                }
-            }
-            else if (comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos")
-            {
-                MessageBox.Show(comboBoxEstilos.SelectedValue.ToString());
-                provas = provaRepo.BuscaProvas(Int32.Parse(comboBoxEstilos.SelectedValue.ToString()), 0, 0);
-
-                foreach (Prova prova in provas)
-                {
-                    if (prova.Estilo == comboBoxEstilos.Text)
-                    {
-                        dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
-                        dataGridViewProvas[4, i].Value = "Editar";
-                        dataGridViewProvas[5, i].Value = "Excluir";
-                        i++;
-                    }
-                }
-            }
-            else if (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos")
-            {
-                provas = provaRepo.BuscaProvas(0, Int32.Parse(comboBoxSexo.SelectedValue.ToString()), 0);
-
-                foreach (Prova prova in provas)
-                {
-                    if (prova.Sexo == comboBoxSexo.Text)
-                    {
-                        dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
-                        dataGridViewProvas[4, i].Value = "Editar";
-                        dataGridViewProvas[5, i].Value = "Excluir";
-                        i++;
-                    }
-                }
-            }
+            if (textBoxDistancia.Text == "" || textBoxDistancia.Text == "Distancia (m)")
+            provas = provaRepo.BuscaProvas(Int32.Parse(comboBoxEstilos.SelectedValue.ToString()),
+                Int32.Parse(comboBoxSexo.SelectedValue.ToString()), 0);
             else
-            {
-                provas = provaRepo.BuscaProvas(0, 0, 0);
-                foreach (Prova prova in provas)
+                provas = provaRepo.BuscaProvas(Int32.Parse(comboBoxEstilos.SelectedValue.ToString()),
+                Int32.Parse(comboBoxSexo.SelectedValue.ToString()), Int32.Parse(textBoxDistancia.Text));
+
+            foreach (Prova prova in provas)
                 {
                     dataGridViewProvas.Rows.Add(prova.IdProva, prova.Sexo, prova.Estilo, prova.Distancia);
                     dataGridViewProvas[4, i].Value = "Editar";
                     dataGridViewProvas[5, i].Value = "Excluir";
-                    i++;
+                    i++;               
                 }
-            }
         }
 
         private void dataGridViewProvas_CellContentClick(object sender, DataGridViewCellEventArgs e)
