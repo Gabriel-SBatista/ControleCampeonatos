@@ -1,12 +1,13 @@
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Diagnostics.Tracing;
+using WinFormsApp2.Entidades;
+using WinFormsApp2.Repository;
 
 namespace WinFormsApp2
 {
     public partial class Form1 : Form
     {
-        private string builder = "Server=DESKTOP-GRKC4AG; Database=CBDA; User=SA; Password=17081981Lasb; TrustServerCertificate=true";
         private int i = 0;
         public Form1()
         {
@@ -15,28 +16,36 @@ namespace WinFormsApp2
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            comboBoxSexo.Items.Add("M");
-            comboBoxSexo.Items.Add("F");
-            comboBoxSexo.Items.Add("Todos");
-            comboBoxEstilos.Items.Add("");
+            SexoRepo sexo = new SexoRepo();
+            EstiloRepo estilo = new EstiloRepo();
+            Estilo todosEstilos = new Estilo();
+            Sexo todosSexos = new Sexo();
 
-            using (SqlConnection connection = new SqlConnection(builder))
-            {
-                string sql = "Select Nome from Estilos";
+            todosSexos.Genero = "Todos";
+            todosSexos.ID_Sexo = 0;
 
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            comboBoxEstilos.Items.Add(reader.GetString(0));
-                        }
-                    }
-                    connection.Close();
-                }
-            }
+            todosEstilos.Nome = "Todos";
+            todosEstilos.ID_Estilo = 0;
+
+            var sexos = new List<Sexo>();
+            var estilos = new List<Estilo>();
+
+            sexos = sexo.BuscaSexo();
+            estilos = estilo.BuscaEstilo();
+
+            sexos.Insert(0, todosSexos);
+            estilos.Insert(0, todosEstilos);
+
+            comboBoxSexo.DisplayMember = "Genero";
+            comboBoxSexo.ValueMember = "ID_Sexo";
+            comboBoxSexo.DataSource = sexos;
+
+            comboBoxEstilos.DisplayMember = "Nome";
+            comboBoxEstilos.ValueMember = "ID_Estilo";
+            comboBoxEstilos.DataSource = estilos;
+
+            comboBoxEstilos.Text = "";
+            comboBoxSexo.Text = "";
 
             dataGridViewProvas.ColumnCount = 4;
             dataGridViewProvas.Columns[0].Name = "Id";
@@ -62,394 +71,148 @@ namespace WinFormsApp2
         private void buttonBuscar_Click(object sender, EventArgs e)
         {
             dataGridViewProvas.Rows.Clear();
+            ProvaRepo provaRepo = new ProvaRepo();
+            var provas = new List<Prova>();
+            int i = 0;
 
-            if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && comboBoxEstilos.Text != "" && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
+            provas = provaRepo.BuscaProvas();
+            if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && (comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos")  && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where P.Distancia = @Distancia " +
-                                    "and E.Nome = @Estilo " +
-                                    "and S.Sexo = @Sexo " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach(Prova prova in  provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    if (prova.Estilo == comboBoxEstilos.Text
+                        && prova.Sexo == comboBoxSexo.Text
+                        && prova.Distancia.ToString() == textBoxDistancia.Text)
                     {
-                        command.Parameters.Add("@Distancia", SqlDbType.SmallInt).Value = textBoxDistancia.Text;
-                        command.Parameters.Add("@Estilo", SqlDbType.NVarChar, 20).Value = comboBoxEstilos.Text;
-                        if (comboBoxSexo.Text == "M")
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Masculino";
-                        else
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Feminino";
-
-
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
+                        dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                        dataGridViewProvas[4, i].Value = "Editar";
+                        dataGridViewProvas[5, i].Value = "Excluir";
+                        i++;
                     }
                 }
             }
-            else if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && comboBoxEstilos.Text != "")
+            else if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && (comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos"))
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where P.Distancia = @Distancia " +
-                                    "and E.Nome = @Estilo " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach (Prova prova in provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    if (prova.Estilo == comboBoxEstilos.Text && prova.Distancia.ToString() == textBoxDistancia.Text)
                     {
-                        command.Parameters.Add("@Distancia", SqlDbType.SmallInt).Value = textBoxDistancia.Text;
-                        command.Parameters.Add("@Estilo", SqlDbType.NVarChar, 20).Value = comboBoxEstilos.Text;
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
+                        dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                        dataGridViewProvas[4, i].Value = "Editar";
+                        dataGridViewProvas[5, i].Value = "Excluir";
+                        i++;
                     }
                 }
-
             }
             else if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)") && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where P.Distancia = @Distancia " +
-                                "and S.Sexo = @Sexo " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach (Prova prova in provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    if (prova.Sexo == comboBoxSexo.Text && prova.Distancia.ToString() == textBoxDistancia.Text)
                     {
-                        command.Parameters.Add("@Distancia", SqlDbType.SmallInt).Value = textBoxDistancia.Text;
-                        if (comboBoxSexo.Text == "M")
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Masculino";
-                        else
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Feminino";
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
+                        dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                        dataGridViewProvas[4, i].Value = "Editar";
+                        dataGridViewProvas[5, i].Value = "Excluir";
+                        i++;
                     }
                 }
             }
             else if ((textBoxDistancia.Text != "" && textBoxDistancia.Text != "Distancia (m)"))
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where P.Distancia = @Distancia " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach (Prova prova in provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    if (prova.Distancia.ToString() == textBoxDistancia.Text)
                     {
-                        command.Parameters.Add("@Distancia", SqlDbType.SmallInt).Value = textBoxDistancia.Text;
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
+                        dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                        dataGridViewProvas[4, i].Value = "Editar";
+                        dataGridViewProvas[5, i].Value = "Excluir";
+                        i++;
                     }
                 }
             }
-            else if (comboBoxEstilos.Text != "" && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
+            else if ((comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos") && (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos"))
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where E.Nome = @Estilo " +
-                                    "and S.Sexo = @Sexo " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach (Prova prova in provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    if (prova.Estilo == comboBoxEstilos.Text && prova.Sexo == comboBoxSexo.Text)
                     {
-                        command.Parameters.Add("@Estilo", SqlDbType.NVarChar, 20).Value = comboBoxEstilos.Text;
-                        if (comboBoxSexo.Text == "M")
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Masculino";
-                        else
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Feminino";
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
+                        dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                        dataGridViewProvas[4, i].Value = "Editar";
+                        dataGridViewProvas[5, i].Value = "Excluir";
+                        i++;
                     }
                 }
             }
-            else if (comboBoxEstilos.Text != "")
+            else if ((comboBoxEstilos.Text != "" && comboBoxEstilos.Text != "Todos"))
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where E.Nome = @Estilo " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach (Prova prova in provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    if (prova.Estilo == comboBoxEstilos.Text)
                     {
-                        command.Parameters.Add("@Estilo", SqlDbType.NVarChar, 20).Value = comboBoxEstilos.Text;
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
+                        dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                        dataGridViewProvas[4, i].Value = "Editar";
+                        dataGridViewProvas[5, i].Value = "Excluir";
+                        i++;
                     }
                 }
             }
             else if (comboBoxSexo.Text != "" && comboBoxSexo.Text != "Todos")
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where S.Sexo = @Sexo " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach (Prova prova in provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    if (prova.Sexo == comboBoxSexo.Text)
                     {
-                        if (comboBoxSexo.Text == "M")
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Masculino";
-                        else
-                            command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = "Feminino";
-
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
+                        dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                        dataGridViewProvas[4, i].Value = "Editar";
+                        dataGridViewProvas[5, i].Value = "Excluir";
+                        i++;
                     }
                 }
             }
             else
             {
-                string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "order by ID_Prova";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                foreach (Prova prova in provas)
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        connection.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            var rows = new List<string[]>();
-
-                            while (reader.Read())
-                            {
-                                string[] row = new string[] {reader.GetInt32(reader.GetOrdinal("ID_Prova")).ToString(),
-                                reader.GetString(reader.GetOrdinal("Nome")), reader.GetString(reader.GetOrdinal("Sexo")),
-                                reader.GetInt16(reader.GetOrdinal("Distancia")).ToString(), "Editar", "Excluir"};
-                                rows.Add(row);
-                            }
-
-                            foreach (string[] rowArray in rows)
-                            {
-                                dataGridViewProvas.Rows.Add(rowArray);
-                            }
-                        }
-
-                        connection.Close();
-                    }
+                    dataGridViewProvas.Rows.Add(prova.ID_Prova, prova.Sexo, prova.Estilo, prova.Distancia);
+                    dataGridViewProvas[4, i].Value = "Editar";
+                    dataGridViewProvas[5, i].Value = "Excluir";
+                    i++;
                 }
             }
         }
 
         private void dataGridViewProvas_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            DataGridView dgv = (DataGridView)sender;
+            ProvaRepo provaRepo = new ProvaRepo();
+            Prova prova = new Prova();         
 
-            if (dgv.Columns[4] is DataGridViewButtonColumn && e.RowIndex >= 0)
+            if (e.ColumnIndex == 4 && e.RowIndex >= 0)
             {
                 var form = new FormAtualiza();
 
-                form.Id = Int32.Parse(dataGridViewProvas[0, e.RowIndex].Value.ToString());
+                form.IdProva = Int32.Parse(dataGridViewProvas[0, e.RowIndex].Value.ToString());
                 form.textBoxDistancia.Text = dataGridViewProvas[3, e.RowIndex].Value.ToString();
-                form.comboBoxEstilo.Text = dataGridViewProvas[1, e.RowIndex].Value.ToString();
-                form.comboBoxSexo.Text = dataGridViewProvas[2, e.RowIndex].Value.ToString();
-                form.Show();
-            }
-
-            else if (dgv.Columns[5] is DataGridViewButtonColumn && e.RowIndex >= 0)
-            {
-                string sql = "DELETE from Provas WHERE ID_Prova = @Id";
-
-                using (SqlConnection connection = new SqlConnection(builder))
+                form.Sexo = dataGridViewProvas[1, e.RowIndex].Value.ToString();
+                form.Estilo = dataGridViewProvas[2, e.RowIndex].Value.ToString();
+                form.ShowDialog();
+                while( form.DialogResult != DialogResult.OK )
                 {
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.Add("@Id", SqlDbType.Int).Value = dataGridViewProvas[0, e.RowIndex].Value;
-                        MessageBox.Show("" + dataGridViewProvas[0, e.RowIndex].Value);
+                    this.Enabled = false;
+                }
 
-                        connection.Open();
-                        int i = command.ExecuteNonQuery();
-                        if (i == 1)
-                        {
-                            MessageBox.Show("Prova removida com sucesso!!");
-                            dataGridViewProvas.Rows.RemoveAt(e.RowIndex);
-                        }
-                        connection.Close();
-                    }
+                prova = provaRepo.BuscaProva(Int32.Parse(dataGridViewProvas[0, e.RowIndex].Value.ToString()));
+                dataGridViewProvas[3, e.RowIndex].Value = prova.Distancia;
+                dataGridViewProvas[1, e.RowIndex].Value = prova.Sexo;
+                dataGridViewProvas[2, e.RowIndex].Value = prova.Estilo;
+            }
+            else if (e.ColumnIndex == 5 && e.RowIndex >= 0)
+            {
+                var confirmaExclusao = MessageBox.Show("Tem certeza que deseja excluir permanentemente essa prova?", "Excluir",
+                MessageBoxButtons.YesNo);
+                if (confirmaExclusao == DialogResult.Yes)
+                {
+                    provaRepo.ExcluiProva(Int32.Parse(dataGridViewProvas[0, e.RowIndex].Value.ToString()));
+                    dataGridViewProvas.Rows.RemoveAt(e.RowIndex);
                 }
             }
         }

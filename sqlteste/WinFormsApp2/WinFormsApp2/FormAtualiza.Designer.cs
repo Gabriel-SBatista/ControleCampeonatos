@@ -125,6 +125,8 @@
         public ComboBox comboBoxSexo;
         public ComboBox comboBoxEstilo;
         public Button btnSalvar;
-        public int Id { get; set; }
+        public int IdProva { get; set; }
+        public string Sexo { get; set; }
+        public string Estilo { get; set; }
     }
 }

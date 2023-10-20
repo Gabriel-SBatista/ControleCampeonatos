@@ -69,9 +69,9 @@
             // comboBoxSexo
             // 
             comboBoxSexo.FormattingEnabled = true;
-            comboBoxSexo.Location = new Point(275, 19);
+            comboBoxSexo.Location = new Point(237, 19);
             comboBoxSexo.Name = "comboBoxSexo";
-            comboBoxSexo.Size = new Size(66, 23);
+            comboBoxSexo.Size = new Size(144, 23);
             comboBoxSexo.TabIndex = 3;
             // 
             // comboBoxEstilos

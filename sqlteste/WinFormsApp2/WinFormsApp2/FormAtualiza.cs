@@ -8,12 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinFormsApp2.Entidades;
+using WinFormsApp2.Repository;
 
 namespace WinFormsApp2
 {
     public partial class FormAtualiza : Form
     {
-        private string builder = "Server=DESKTOP-GRKC4AG; Database=CBDA; User=SA; Password=17081981Lasb; TrustServerCertificate=true";
         public FormAtualiza()
         {
             InitializeComponent();
@@ -21,149 +22,46 @@ namespace WinFormsApp2
 
         private void FormAtualiza_Load(object sender, EventArgs e)
         {
-            using (SqlConnection connection = new SqlConnection(builder))
-            {
-                string sql = "SELECT Nome from Estilos";
+            SexoRepo sexoRepo = new SexoRepo();
+            EstiloRepo estiloRepo = new EstiloRepo();
 
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            comboBoxEstilo.Items.Add(reader.GetString(0));
-                        }
-                    }
-                }
+            var sexos = new List<Sexo>();
+            var estilos = new List<Estilo>();
 
-                sql = "SELECT Sexo from Sexos";
+            sexos = sexoRepo.BuscaSexo();
+            estilos = estiloRepo.BuscaEstilo();
 
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            comboBoxSexo.Items.Add(reader.GetString(0));
-                        }
-                    }
-                }
+            comboBoxSexo.DisplayMember = "Genero";
+            comboBoxSexo.ValueMember = "ID_Sexo";
+            comboBoxSexo.DataSource = sexos;
 
-                connection.Close();
-            }
+            comboBoxEstilo.DisplayMember = "Nome";
+            comboBoxEstilo.ValueMember = "ID_Estilo";
+            comboBoxEstilo.DataSource = estilos;
+
+            comboBoxSexo.Text = this.Sexo;
+            comboBoxEstilo.Text = this.Estilo;
+
         }
 
         private void btnSalvar_Click(object sender, EventArgs e)
         {
-            if(btnSalvar.Text == "Salvar")
+            ProvaRepo provaRepo = new ProvaRepo();
+
+            if (btnSalvar.Text == "Salvar")
             {
-                string sql = "UPDATE Provas SET ID_Sexo = @Sexo, ID_Estilo = @Estilo, Distancia = @Distancia WHERE ID_Prova = @Id";
-                string buscaIdSexo = "SELECT ID_Sexo FROM Sexos WHERE Sexo = @Sexo";
-                string buscaIdEstilo = "SELECT ID_Estilo FROM Estilos WHERE Nome = @Estilo";
+                provaRepo.AtualizaProva(this.IdProva, Int32.Parse(comboBoxSexo.SelectedValue.ToString()), Int32.Parse(comboBoxEstilo.SelectedValue.ToString()), Int32.Parse(textBoxDistancia.Text));
 
-                using (SqlConnection connection = new SqlConnection(builder))
-                {
-                    connection.Open();
-                    byte idSexo = 0;
-                    byte idEstilo = 0;
-
-                    using(SqlCommand command = new SqlCommand(buscaIdSexo, connection))
-                    {
-                        command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = comboBoxSexo.Text;
-
-                        using(SqlDataReader reader = command.ExecuteReader())
-                        {
-                            reader.Read();
-                            idSexo = reader.GetByte(0);
-                        }
-                    }
-
-                    using (SqlCommand command = new SqlCommand(buscaIdEstilo, connection))
-                    {
-                        command.Parameters.Add("@Estilo", SqlDbType.NVarChar, 20).Value = comboBoxEstilo.Text;
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            reader.Read();
-                            idEstilo = reader.GetByte(0);
-                        }
-                    }
-
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.Add("@Sexo", SqlDbType.TinyInt).Value = idSexo;
-                        command.Parameters.Add("@Estilo", SqlDbType.SmallInt).Value = idEstilo;
-                        command.Parameters.Add("@Distancia", SqlDbType.SmallInt).Value = textBoxDistancia.Text;
-                        command.Parameters.Add("@Id", SqlDbType.Int).Value = this.Id;
-
-                        int i = command.ExecuteNonQuery();
-
-                        if (i == 1)
-                        {
-                            MessageBox.Show("Prova atualizada com sucesso!!");
-                        }
-
-                    }
-
-                    connection.Close();
-                    
-                    this.Close();
-                }
-
+                this.DialogResult = DialogResult.OK;
+                this.Close();
             }
             else
             {
-                string sql = "INSERT INTO Provas(ID_Sexo, ID_Estilo, Distancia) VALUES (@Sexo, @Estilo, @Distancia)";
-                string buscaIdSexo = "SELECT ID_Sexo FROM Sexos WHERE Sexo = @Sexo";
-                string buscaIdEstilo = "SELECT ID_Estilo FROM Estilos WHERE Nome = @Estilo";
+                provaRepo.CriaProva(Int32.Parse(comboBoxSexo.SelectedValue.ToString()), Int32.Parse(comboBoxEstilo.SelectedValue.ToString()), Int32.Parse(textBoxDistancia.Text));
 
-                using (SqlConnection connection = new SqlConnection(builder))
-                {
-                    connection.Open();
-                    byte idSexo = 0;
-                    byte idEstilo = 0;
-
-                    using (SqlCommand command = new SqlCommand(buscaIdSexo, connection))
-                    {
-                        command.Parameters.Add("@Sexo", SqlDbType.NVarChar, 15).Value = comboBoxSexo.Text;
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            reader.Read();
-                            idSexo = reader.GetByte(0);
-                        }
-                    }
-
-                    using (SqlCommand command = new SqlCommand(buscaIdEstilo, connection))
-                    {
-                        command.Parameters.Add("@Estilo", SqlDbType.NVarChar, 20).Value = comboBoxEstilo.Text;
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            reader.Read();
-                            idEstilo = reader.GetByte(0);
-                        }
-                    }
-
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.Add("@Sexo", SqlDbType.TinyInt).Value = idSexo;
-                        command.Parameters.Add("@Estilo", SqlDbType.SmallInt).Value = idEstilo;
-                        command.Parameters.Add("@Distancia", SqlDbType.SmallInt).Value = textBoxDistancia.Text;
-
-                        int i = command.ExecuteNonQuery();
-
-                        if (i == 1)
-                        {
-                            MessageBox.Show("Prova criada com sucesso!!");
-                        }
-
-                    }
-                    connection.Close();
-
-                    this.Close();
-                }
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+                
             }
 
         }
