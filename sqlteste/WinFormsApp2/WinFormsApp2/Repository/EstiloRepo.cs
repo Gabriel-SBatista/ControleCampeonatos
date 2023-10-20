@@ -29,7 +29,7 @@ namespace WinFormsApp2.Repository
                     while (reader.Read())
                     {
                         Estilo estilo = new Estilo();
-                        estilo.ID_Estilo = reader.GetByte(reader.GetOrdinal("ID_Estilo"));
+                        estilo.IdEstilo = reader.GetByte(reader.GetOrdinal("ID_Estilo"));
                         estilo.Nome = reader.GetString(reader.GetOrdinal("Nome"));
                         estilos.Add(estilo);
                     }

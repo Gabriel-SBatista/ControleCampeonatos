@@ -10,7 +10,7 @@ namespace WinFormsApp2.Entidades
 {
     internal class Sexo
     {
-        public byte ID_Sexo { get; set; }
+        public byte IdSexo { get; set; }
         public string Genero { get; set; }
 
     }

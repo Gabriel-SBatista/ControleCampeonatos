@@ -12,7 +12,7 @@ namespace WinFormsApp2.Repository
 {
     internal class ProvaRepo
     {
-        public List<Prova> BuscaProvas()
+        public List<Prova> BuscaProvas(int idEstilo, int idSexo, int distancia)
         {
             ConexaoBanco conexao = new ConexaoBanco();
             SqlConnection conn = conexao.IniciaConexao();
@@ -23,6 +23,9 @@ namespace WinFormsApp2.Repository
                                     "on E.ID_Estilo = P.ID_Estilo " +
                                 "inner join Sexos S " +
                                     "on S.ID_Sexo = P.ID_Sexo " +
+                                "where @IdEstilo = 0 or P.ID_Estilo = @IdEstilo " +
+                                    "and @IdSexo = 0 or P.ID_Sexo = @IdSexo " +
+                                    "and @Distancia = 0 or P.Distancia = @Distancia " +
                                 "order by ID_Prova";
 
             var provas = new List<Prova>();
@@ -31,12 +34,16 @@ namespace WinFormsApp2.Repository
 
             using (SqlCommand command = new SqlCommand(sql, conn))
             {
+                command.Parameters.Add("@IdEstilo", SqlDbType.TinyInt).Value  = idEstilo;
+                command.Parameters.Add("@IdSexo", SqlDbType.TinyInt).Value = idSexo;
+                command.Parameters.Add("@Distancia", SqlDbType.SmallInt).Value = distancia; 
+
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         Prova prova = new Prova();
-                        prova.ID_Prova = reader.GetInt32(reader.GetOrdinal("ID_Prova"));
+                        prova.IdProva = reader.GetInt32(reader.GetOrdinal("ID_Prova"));
                         prova.Estilo = reader.GetString(reader.GetOrdinal("Nome"));
                         prova.Sexo = reader.GetString(reader.GetOrdinal("Sexo"));
                         prova.Distancia = reader.GetInt16(reader.GetOrdinal("Distancia"));
@@ -73,7 +80,7 @@ namespace WinFormsApp2.Repository
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     reader.Read();                   
-                    prova.ID_Prova = reader.GetInt32(reader.GetOrdinal("ID_Prova"));
+                    prova.IdProva = reader.GetInt32(reader.GetOrdinal("ID_Prova"));
                     prova.Estilo = reader.GetString(reader.GetOrdinal("Nome"));
                     prova.Sexo = reader.GetString(reader.GetOrdinal("Sexo"));
                     prova.Distancia = reader.GetInt16(reader.GetOrdinal("Distancia"));

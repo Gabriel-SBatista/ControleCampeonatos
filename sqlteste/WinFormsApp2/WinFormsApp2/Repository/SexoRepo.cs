@@ -29,7 +29,7 @@ namespace WinFormsApp2.Repository
                     while (reader.Read())
                     {
                         Sexo sexo = new Sexo();
-                        sexo.ID_Sexo = reader.GetByte(reader.GetOrdinal("ID_Sexo"));
+                        sexo.IdSexo = reader.GetByte(reader.GetOrdinal("ID_Sexo"));
                         sexo.Genero = reader.GetString(reader.GetOrdinal("Sexo"));
                         sexos.Add(sexo);
                     }

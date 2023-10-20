@@ -11,7 +11,7 @@ namespace WinFormsApp2.Entidades
 {
     internal class Prova
     {
-        public int ID_Prova { get; set; }
+        public int IdProva { get; set; }
         public string Sexo{ get; set; }
         public string Estilo { get; set; }
         public short Distancia { get; set; }          

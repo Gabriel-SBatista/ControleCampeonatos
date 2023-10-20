@@ -10,7 +10,7 @@ namespace WinFormsApp2.Entidades
 {
     internal class Estilo
     {
-        public byte ID_Estilo { get; set; }
+        public byte IdEstilo { get; set; }
         public string Nome { get; set; }
 
     }

@@ -32,11 +32,11 @@ namespace WinFormsApp2
             estilos = estiloRepo.BuscaEstilo();
 
             comboBoxSexo.DisplayMember = "Genero";
-            comboBoxSexo.ValueMember = "ID_Sexo";
+            comboBoxSexo.ValueMember = "IdSexo";
             comboBoxSexo.DataSource = sexos;
 
             comboBoxEstilo.DisplayMember = "Nome";
-            comboBoxEstilo.ValueMember = "ID_Estilo";
+            comboBoxEstilo.ValueMember = "IdEstilo";
             comboBoxEstilo.DataSource = estilos;
 
             comboBoxSexo.Text = this.Sexo;

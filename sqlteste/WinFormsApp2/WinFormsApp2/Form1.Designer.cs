@@ -65,6 +65,7 @@
             textBoxDistancia.Text = "Distancia (m)";
             textBoxDistancia.TextAlign = HorizontalAlignment.Center;
             textBoxDistancia.Click += textBoxDistancia_Click;
+            textBoxDistancia.TextChanged += textBoxDistancia_TextChanged;
             // 
             // comboBoxSexo
             // 
