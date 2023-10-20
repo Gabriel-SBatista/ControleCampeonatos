@@ -195,10 +195,6 @@ namespace WinFormsApp2
                 form.Sexo = dataGridViewProvas[1, e.RowIndex].Value.ToString();
                 form.Estilo = dataGridViewProvas[2, e.RowIndex].Value.ToString();
                 form.ShowDialog();
-                while( form.DialogResult != DialogResult.OK )
-                {
-                    this.Enabled = false;
-                }
 
                 prova = provaRepo.BuscaProva(Int32.Parse(dataGridViewProvas[0, e.RowIndex].Value.ToString()));
                 dataGridViewProvas[3, e.RowIndex].Value = prova.Distancia;
@@ -223,7 +219,7 @@ namespace WinFormsApp2
 
             form.btnSalvar.Text = "Criar";
 
-            form.Show();
+            form.ShowDialog();
         }
     }
 }

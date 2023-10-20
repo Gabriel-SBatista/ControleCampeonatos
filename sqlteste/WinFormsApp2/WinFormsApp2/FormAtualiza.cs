@@ -52,14 +52,12 @@ namespace WinFormsApp2
             {
                 provaRepo.AtualizaProva(this.IdProva, Int32.Parse(comboBoxSexo.SelectedValue.ToString()), Int32.Parse(comboBoxEstilo.SelectedValue.ToString()), Int32.Parse(textBoxDistancia.Text));
 
-                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
             {
                 provaRepo.CriaProva(Int32.Parse(comboBoxSexo.SelectedValue.ToString()), Int32.Parse(comboBoxEstilo.SelectedValue.ToString()), Int32.Parse(textBoxDistancia.Text));
 
-                this.DialogResult = DialogResult.OK;
                 this.Close();
                 
             }
