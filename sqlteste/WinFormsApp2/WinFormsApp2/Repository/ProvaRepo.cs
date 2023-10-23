@@ -17,16 +17,16 @@ namespace WinFormsApp2.Repository
             ConexaoBanco conexao = new ConexaoBanco();
             SqlConnection conn = conexao.IniciaConexao();
 
-            string sql = "select P.ID_Prova, E.Nome, S.Sexo, P.Distancia " +
-                            "from Provas P " +
-                                "inner join Estilos E " +
-                                    "on E.ID_Estilo = P.ID_Estilo " +
-                                "inner join Sexos S " +
-                                    "on S.ID_Sexo = P.ID_Sexo " +
-                                "where (@IdEstilo = 0 or P.ID_Estilo = @IdEstilo) " +
-                                    "and (@IdSexo = 0 or P.ID_Sexo = @IdSexo) " +
-                                    "and (@Distancia = 0 or P.Distancia = @Distancia) " +
-                                "order by ID_Prova";
+            string sql = @"select P.ID_Prova, E.Nome, S.Sexo, P.Distancia 
+                            from Provas P 
+                                inner join Estilos E 
+                                    on E.ID_Estilo = P.ID_Estilo
+                                inner join Sexos S 
+                                    on S.ID_Sexo = P.ID_Sexo 
+                                where (@IdEstilo = 0 or P.ID_Estilo = @IdEstilo) 
+                                    and (@IdSexo = 0 or P.ID_Sexo = @IdSexo) 
+                                    and (@Distancia = 0 or P.Distancia = @Distancia) 
+                                order by ID_Prova";
 
             var provas = new List<Prova>();
 
